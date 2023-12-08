@@ -40,6 +40,25 @@ impl Game {
     fn all_possible(&self) -> bool {
         self.bags.iter().all(|b| b.possible())
     }
+
+    fn min_necessary_power(&self) -> usize {
+        let mut red = 1;
+        let mut green = 1;
+        let mut blue = 1;
+        for bag in self.bags.iter() {
+            if bag.red > red {
+                red = bag.red;
+            }
+            if bag.green > green {
+                green = bag.green;
+            }
+
+            if bag.blue > blue {
+                blue = bag.blue;
+            }
+        }
+        red * green * blue
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -98,9 +117,7 @@ fn main() {
     for line in stdin.lines() {
         let line = line.unwrap();
         let game = Game::parse_game(&line);
-        if game.all_possible() {
-            sum += game.idx;
-        }
+        sum += game.min_necessary_power();
     }
     println!("{sum}");
 }
@@ -131,6 +148,7 @@ mod test {
             Bag::new(0, 2, 0),
         ]));
         assert!(game.all_possible());
+        assert_eq!(game.min_necessary_power(), 48);
 
         let s = "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red";
         let game = Game::parse_game(s);
@@ -140,5 +158,6 @@ mod test {
             Bag::new(1, 5, 0),
         ]));
         assert!(!game.all_possible());
+        assert_eq!(game.min_necessary_power(), 1560);
     }
 }
